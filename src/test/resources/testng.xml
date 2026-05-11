@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Esamrudha Suite">
+    <test name="All Tests">
+        <classes>
+            <class name="Tests.AHELP_LoginTest"/>
+            <class name="Tests.NewCalfRegistration"/>
+            <class name="Tests.CalfEnrollmentTest"/>
+            <class name="Tests.DuplicateMobileNumberError"/>
+        </classes>
+    </test>
+</suite>
