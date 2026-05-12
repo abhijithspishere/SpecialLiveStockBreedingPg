@@ -15,12 +15,7 @@ public class BasePage {
     protected WebDriverWait wait;
     protected JavascriptExecutor js;
 
-    // Default explicit wait timeout in seconds – change here if needed
     private static final int EXPLICIT_WAIT_TIMEOUT = 20;
-
-    // Optional: Later you can replace the line above with a value from ConfigReader:
-    // private static final int EXPLICIT_WAIT_TIMEOUT = ConfigReader.getExplicitWait();
-    // (You would need to add getExplicitWait() to ConfigReader first)
 
     public BasePage(WebDriver driver) {
         this.driver = driver;
@@ -28,8 +23,6 @@ public class BasePage {
         this.js = (JavascriptExecutor) driver;
         PageFactory.initElements(driver, this);
     }
-
-    // ---------- Element interaction with waits ----------
 
     protected void click(WebElement element) {
         wait.until(ExpectedConditions.elementToBeClickable(element));
@@ -51,8 +44,6 @@ public class BasePage {
         wait.until(ExpectedConditions.visibilityOf(element));
         return element.getAttribute(attribute);
     }
-
-    // ---------- Verification / state checks ----------
 
     protected boolean isDisplayed(WebElement element) {
         try {
@@ -81,8 +72,6 @@ public class BasePage {
         }
     }
 
-    // ---------- Explicit waiting helpers ----------
-
     protected void waitForVisibility(WebElement element) {
         wait.until(ExpectedConditions.visibilityOf(element));
     }
@@ -105,7 +94,6 @@ public class BasePage {
                 js.executeScript("return document.readyState").equals("complete"));
     }
 
-    // Short static sleep – use sparingly
     protected void waitForMilliseconds(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
@@ -114,7 +102,6 @@ public class BasePage {
         }
     }
 
-    // ---------- JavaScript utilities ----------
 
     protected void scrollToElement(WebElement element) {
         js.executeScript("arguments[0].scrollIntoView(true);", element);
@@ -139,8 +126,6 @@ public class BasePage {
     protected void highlightElement(WebElement element) {
         js.executeScript("arguments[0].style.border='3px solid red'", element);
     }
-
-    // ---------- Window / tab handling ----------
 
     protected void switchToNewWindow() {
         String originalWindow = driver.getWindowHandle();

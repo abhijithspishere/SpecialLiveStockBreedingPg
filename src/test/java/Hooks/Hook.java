@@ -45,7 +45,7 @@ public class Hook {
     @BeforeSuite
     public void setupSuite() {
         //Delete old reports before creating new ones
-        //deleteOldReports("test-output/reports");
+        deleteOldReports("test-output/reports");
 
         // Create required directories
         createDirectory("test-output/reports");

@@ -1,15 +1,33 @@
 package PageObjects;
 
 import Utils.ConfigReader;
+import Utils.ExcelUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.time.Duration;
 
 public class AHELP_LoginPage extends BasePage {
+
+    private static String farmerFirstName;
+    private static String farmerLastName;
+    private static String farmerAddress;
+    private static String farmerRationCardNumber;
+    private static String farmerPincode;
+    private static String farmerDateOfBirth;
+    private static String calfPetName;
+    private static String calfDateOfBirth;
+    private static String calfIdentificationMark;
+    private static String calfLength;
+    private static String calfGirth;
+    private static String enrollmentGirth;
+    private static String enrollmentLength;
+    private static String enrollmentRemarks;
+
 
     // The main LOGIN button on the home page
     @FindBy(xpath = "//a[normalize-space()='LOGIN']")
@@ -219,25 +237,65 @@ public class AHELP_LoginPage extends BasePage {
 
     private String registeredMobileNumber;
 
-    public AHELP_LoginPage(WebDriver driver) {
+    public AHELP_LoginPage(WebDriver driver) throws IOException {
         super(driver);
+        loadExcelData();
     }
+
+    private void loadExcelData() throws IOException {
+        String filePath = "src/test/resources/testdata/test-data.xlsx";
+        System.out.println("Loading Excel from: " + filePath);
+
+        Object[][] farmerData = ExcelUtils.getTestData(filePath, "FarmerData");
+        if (farmerData.length > 0) {
+            farmerFirstName = (String) farmerData[0][0];
+            farmerLastName = (String) farmerData[0][1];
+            farmerAddress = (String) farmerData[0][2];
+            farmerRationCardNumber = (String) farmerData[0][3];
+            farmerPincode = (String) farmerData[0][4];
+            farmerDateOfBirth = (String) farmerData[0][5];
+        }
+
+
+        Object[][] calfData = ExcelUtils.getTestData(filePath, "CalfData");
+        if (calfData.length > 0) {
+            calfPetName = (String) calfData[0][0];
+            calfDateOfBirth = (String) calfData[0][1];
+            calfIdentificationMark = (String) calfData[0][2];
+        }
+
+
+        Object[][] enrollmentData = ExcelUtils.getTestData(filePath, "EnrollmentData");
+        if (enrollmentData.length > 0) {
+            calfLength = (String) enrollmentData[0][0];
+            calfGirth = (String) enrollmentData[0][1];
+            enrollmentGirth = (String) enrollmentData[0][2];
+            enrollmentLength = (String) enrollmentData[0][3];
+            enrollmentRemarks = (String) enrollmentData[0][4];
+        }
+
+    }
+
     public void clickMainLoginButton() {
         click(loginMainButton);
     }
+
     public void selectAHELPRole() {
         click(ahelpRadioButton);
     }
+
     public void enterUsername(String username) {
         sendKeys(usernameField, username);
     }
+
     public void enterPassword(String password) throws InterruptedException {
         sendKeys(passwordField, password);
-//        Thread.sleep(2000);
     }
+
     public void submitLogin() {
         click(loginSubmitButton);
     }
+
     public void loginAsAHELP(String username, String password) throws InterruptedException {
         clickMainLoginButton();
         selectAHELPRole();
@@ -253,28 +311,30 @@ public class AHELP_LoginPage extends BasePage {
     }
 
     public void addFarmerDuplicateMobile() throws InterruptedException {
-        registeredMobileNumber = getTestFarmerMobile();
+        registeredMobileNumber = getTestFarmerMobile(); // Mobile from config.properties
         click(clickHereLink);
         sendKeys(mobileNumberField, registeredMobileNumber);
         click(firstNameField);
     }
-    public String getMobileNumberError() {
 
+    public String getMobileNumberError() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOf(mobileNumberErrorMessage));
         return mobileNumberErrorMessage.getText();
     }
 
     public void addFarmer() throws InterruptedException {
+        registeredMobileNumber = getTestFarmerMobile(); // Mobile from config.properties
 
-        registeredMobileNumber = getTestFarmerMobile(); // Store the mobile number for later use in calf registration
         click(clickHereLink);
-        sendKeys(mobileNumberField,registeredMobileNumber);
-        sendKeys(firstNameField,"Sameer");
-        sendKeys(lastNameField,"Saleem");
-        sendKeys(addressField,"Anchal, Pathanamthitta");
-        sendKeys(rationCardNumberField,"1234567897");
-        sendKeys(pincodeField,"123456");
+        sendKeys(mobileNumberField, registeredMobileNumber);
+        sendKeys(firstNameField, farmerFirstName);           // From Excel
+        sendKeys(lastNameField, farmerLastName);             // From Excel
+        sendKeys(addressField, farmerAddress);               // From Excel
+        sendKeys(rationCardNumberField, farmerRationCardNumber); // From Excel
+        sendKeys(pincodeField, farmerPincode);               // From Excel
+
+        // These remain as direct interactions (not from Excel)
         click(reservationCategoryDropdown);
         click(reservationCategoryGeneralOption);
         click(districtDropdown);
@@ -285,7 +345,8 @@ public class AHELP_LoginPage extends BasePage {
         click(localBodyEnadimangalamOption);
         click(wardDropdown);
         click(wardMangaduVadakOption);
-        sendKeys(dateOfBirthField,"01/05/2020");
+
+        sendKeys(dateOfBirthField, farmerDateOfBirth);       // From Excel
         click(dateOfBirthMay1Option);
         click(genderMaleRadioButton);
         click(dataConsentCheckbox);
@@ -296,13 +357,12 @@ public class AHELP_LoginPage extends BasePage {
     public void searchOwnerByMobile() throws InterruptedException {
         if (registeredMobileNumber != null) {
             sendKeys(searchOwner, registeredMobileNumber);
-            click((searchBtn));
+            click(searchBtn);
             Thread.sleep(2000);
         } else {
             throw new IllegalStateException("No mobile number stored. Please register a farmer first.");
         }
     }
-
 
     public String getTestFarmerMobile() {
         return ConfigReader.getProperty("test.farmer.mobile");
@@ -312,11 +372,12 @@ public class AHELP_LoginPage extends BasePage {
         this.registeredMobileNumber = mobile;
     }
 
-    public void newCalfReg(){
+    public void newCalfReg() {
         click(viewProfileBtn);
         click(registerNewCalfBtn);
         click(damNotAvailableCheckbox);
         waitForPageLoad();
+
         String uniqueTag = RandomStringUtils.randomNumeric(12);
         sendKeys(earTagNumberField, uniqueTag);
 
@@ -324,17 +385,18 @@ public class AHELP_LoginPage extends BasePage {
         scrollToElement(breedTypeCrossbredRadioButton);
         clickWithJS(breedTypeCrossbredRadioButton);
 
-        sendKeys(petNameField,"Lucky");
+        sendKeys(petNameField, calfPetName);                 // From Excel
         click(breedDropdown);
         click(holsteinFresianDropdown);
-        sendKeys(calfDateOfBirthField,"07/05/2026");
+        sendKeys(calfDateOfBirthField, calfDateOfBirth);     // From Excel
         click(calfDateOfBirthMay7Option);
         click(colorDropdown);
         click(amberChampagneColorOption);
-        sendKeys(identificationMarkField,"Small scar on left ear");
+        sendKeys(identificationMarkField, calfIdentificationMark); // From Excel
         click(calfDataConsentCheckbox);
         click(submitCalfRegistrationButton);
     }
+
     public String newCalfRegAndGetAlert() {
         newCalfReg();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -351,39 +413,40 @@ public class AHELP_LoginPage extends BasePage {
         click(calvingDetailsButton);
         click(calvingEaseRadioButton);
         click(calvingEaseNormalOption);
-        sendKeys(calfLengthField,"50");
-        sendKeys(calfGirthField,"30");
+
+        sendKeys(calfLengthField, calfLength);               // From Excel
+        sendKeys(calfGirthField, calfGirth);                 // From Excel
         click(saveCalvingDetailsButton);
+
         try {
             click(schemeDropdown);
         } catch (ElementClickInterceptedException e) {
-
             scrollToElement(schemeDropdown);
-
             clickWithJS(schemeDropdown);
         }
+
         click(govardhiniSchemeDropdown);
         click(checksVOData0Checkbox);
         click(checksVOData1Checkbox);
         click(checksVOData2Checkbox);
         click(checksVOData3Checkbox);
-        sendKeys(girthField,"30");
-        sendKeys(lengthField,"50");
-        sendKeys(requestRemarksField,"Requesting enrollment for the newly registered calf.");
+
+        sendKeys(girthField, enrollmentGirth);               // From Excel
+        sendKeys(lengthField, enrollmentLength);             // From Excel
+        sendKeys(requestRemarksField, enrollmentRemarks);    // From Excel
         click(requestConfirmCheckbox);
         click(submitRequestButton);
     }
 
     public String getEnrollmentSuccessMessage() {
-
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOf(enrollmentSuccessMessage));
         return enrollmentSuccessMessage.getText();
     }
 
-    public void loginWithConfigCredentials() throws InterruptedException {
-        String username = ConfigReader.getUsername("ahelp");
-        String password = ConfigReader.getPassword("ahelp");
-        loginAsAHELP(username, password);
-    }
+        public void loginWithConfigCredentials() throws InterruptedException {
+            String username = ConfigReader.getUsername("ahelp");
+            String password = ConfigReader.getPassword("ahelp");
+            loginAsAHELP(username, password);
+        }
 }
