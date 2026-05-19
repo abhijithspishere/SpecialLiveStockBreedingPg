@@ -5,6 +5,9 @@ import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -15,6 +18,7 @@ import org.testng.annotations.*;
 import Utils.ConfigReader;
 import Utils.Logs;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -28,10 +32,8 @@ public class Hook {
     protected ExtentTest test;
     protected Logs logger;
 
-
     private void deleteOldReports(String folderPath) {
         File folder = new File(folderPath);
-
         if (folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles();
             if (files != null) {
@@ -44,9 +46,6 @@ public class Hook {
 
     @BeforeSuite
     public void setupSuite() {
-        //Delete old reports before creating new ones
-        deleteOldReports("test-output/reports");
-
         // Create required directories
         createDirectory("test-output/reports");
         createDirectory("test-output/screenshots");
@@ -70,14 +69,12 @@ public class Hook {
         extent.setSystemInfo("Java Version", System.getProperty("java.version"));
     }
 
-
     @BeforeMethod
     @Parameters({"browser", "environment","portal"})
     public void setup(Method method,
                       @Optional("chrome") String browser,
                       @Optional("qa") String env,
-                      @Optional("user") String portal)
-    {
+                      @Optional("user") String portal) {
         // Initialize logger
         logger = new Logs(method.getName());
 
@@ -113,34 +110,49 @@ public class Hook {
                 WebDriverManager.chromedriver().setup();
                 ChromeOptions options = new ChromeOptions();
                 Map<String, Object> prefs = new HashMap<String, Object>();
-                prefs.put("profile.default_content_setting_values.media_stream_camera", 1); // 1 = Allow, 2 = Block
+                prefs.put("profile.default_content_setting_values.media_stream_camera", 1);
                 prefs.put("profile.default_content_setting_values.geolocation", 1);
                 options.setExperimentalOption("prefs", prefs);
-
                 options.addArguments("--use-fake-ui-for-media-stream");
                 options.addArguments("--start-maximized");
                 options.addArguments("--disable-notifications");
                 driver = new ChromeDriver(options);
                 break;
-
             case "firefox":
                 WebDriverManager.firefoxdriver().setup();
                 driver = new FirefoxDriver();
                 driver.manage().window().maximize();
                 break;
-
             case "edge":
                 WebDriverManager.edgedriver().setup();
                 driver = new EdgeDriver();
                 driver.manage().window().maximize();
                 break;
-
             default:
                 throw new IllegalArgumentException("Unsupported browser: " + browser);
         }
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(90));
-        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(30));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(70));
+        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(20));
+    }
+
+    // Method to capture screenshot
+    private String captureScreenshot(String testName, ITestResult result) {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String screenshotName = testName + "_" + timestamp + ".png";
+        String screenshotPath = "test-output/screenshots/" + screenshotName;
+
+        try {
+            TakesScreenshot ts = (TakesScreenshot) driver;
+            File source = ts.getScreenshotAs(OutputType.FILE);
+            File destination = new File(screenshotPath);
+            FileUtils.copyFile(source, destination);
+            logger.info("Screenshot captured: " + screenshotPath);
+            return screenshotPath;
+        } catch (Exception e) {
+            logger.error("Failed to capture screenshot: " + e.getMessage());
+            return null;
+        }
     }
 
     @AfterMethod
@@ -150,6 +162,15 @@ public class Hook {
         if (result.getStatus() == ITestResult.FAILURE) {
             logger.error("Test FAILED: " + testName);
             test.log(Status.FAIL, "Test failed: " + result.getThrowable());
+
+            // Capture screenshot on failure
+            String screenshotPath = captureScreenshot(testName, result);
+            if (screenshotPath != null) {
+                // Add screenshot to extent report
+                test.addScreenCaptureFromPath(screenshotPath);
+                test.log(Status.FAIL, "Screenshot captured: " + screenshotPath);
+                logger.info("Screenshot attached to extent report");
+            }
         } else if (result.getStatus() == ITestResult.SKIP) {
             logger.warn("Test SKIPPED: " + testName);
             test.log(Status.SKIP, "Test skipped");
@@ -159,7 +180,7 @@ public class Hook {
         }
 
         if (driver != null) {
-           // driver.quit();
+            // driver.quit();
         }
     }
 
@@ -177,5 +198,4 @@ public class Hook {
             directory.mkdirs();
         }
     }
-
 }

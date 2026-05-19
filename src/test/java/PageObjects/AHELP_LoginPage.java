@@ -2,10 +2,12 @@ package PageObjects;
 
 import Utils.ConfigReader;
 import Utils.ExcelUtils;
+import Utils.FileConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
@@ -85,7 +87,7 @@ public class AHELP_LoginPage extends BasePage {
     @FindBy(xpath = "//span[@id='select2-select-district-container']")
     private WebElement districtDropdown;
 
-    @FindBy(xpath = "//li[normalize-space()='Pathanamthitta']")
+    @FindBy(xpath = "//li[contains(@class,'select2-results__option') and text()='Palakkad']")
     private WebElement districtPathanamthittaOption;
 
     @FindBy(xpath = "//span[@id='select2-select-lgdType-container']")
@@ -97,13 +99,13 @@ public class AHELP_LoginPage extends BasePage {
     @FindBy(xpath = "//span[@id='select2-select-lgd-container']")
     private WebElement localBodyDropdown;
 
-    @FindBy(xpath = "//li[text()='Mezhuveli']")
+    @FindBy(xpath = "//li[contains(@class,'select2-results__option') and text()='Tarur']")
     private WebElement localBodyEnadimangalamOption;
 
     @FindBy(xpath = "//span[@id='select2-select-ward-container']")
     private WebElement wardDropdown;
 
-    @FindBy(xpath = "//li[text()='12 - MEZHUVELI']")
+    @FindBy(xpath = "//li[contains(@class,'select2-results__option') and text()='13 - TARUR']")
     private WebElement wardMangaduVadakOption;
 
     @FindBy(xpath = "//input[@id='dateOfBirth']")
@@ -131,6 +133,9 @@ public class AHELP_LoginPage extends BasePage {
     @FindBy(xpath = "//a[normalize-space()='View Profile']")
     private WebElement viewProfileBtn;
 
+    @FindBy(xpath = "//a[normalize-space()='View']")
+    private WebElement viewNewBtn;
+
     @FindBy(xpath = "//a[normalize-space()='Register New Calf']")
     private WebElement registerNewCalfBtn;
 
@@ -155,7 +160,7 @@ public class AHELP_LoginPage extends BasePage {
     @FindBy(xpath = "//input[@id='calfDateOfBirth']")
     private WebElement calfDateOfBirthField;
 
-    @FindBy(xpath = "//span[@aria-label='May 7, 2026']")
+    @FindBy(xpath = "//span[@aria-label='May 9, 2026']")
     private WebElement calfDateOfBirthMay7Option;
 
     @FindBy(xpath = "//span[@id='select2-select-colors-container']")
@@ -235,6 +240,74 @@ public class AHELP_LoginPage extends BasePage {
     @FindBy(xpath = "//span[@id='mobError']")
     private WebElement mobileNumberErrorMessage;
 
+    @FindBy(xpath = "//button[contains(text(),'Add')]")
+    private WebElement addBank;
+
+    @FindBy(xpath = "//input[@id='bankName']")
+    private WebElement bankNameField;
+
+    @FindBy(xpath = "//input[@id='accountNumber']")
+    private WebElement accountNumberField;
+
+    @FindBy(xpath = "//input[@id='ifscCode']")
+    private WebElement ifscCodeField;
+
+    @FindBy(xpath = "//input[@id='frmImages']")
+    private WebElement passbookUploadField;
+
+    @FindBy(xpath = "//button[@id='submitBankDetails']")
+    private WebElement submitBankDetailsButton;
+
+    @FindBy(xpath = "//button[@data-target='#agreementUploadModal']")
+    private WebElement uploadSlbpbtn;
+
+    @FindBy(xpath = "//input[@id='agreementFile']")
+    private WebElement agreementUploadField;
+
+    @FindBy(xpath = "//button[contains(text(),'Upload')]")
+    private WebElement uploadAgreementButton;
+
+    @FindBy(xpath = "//button[normalize-space()='Update']")
+    private WebElement updateApcosBtn;
+
+    @FindBy(xpath = "//select[@id='apcosSelect']")
+    private WebElement apcosDropdown;
+
+
+    @FindBy(xpath = "//button[normalize-space()='Save']")
+    private WebElement saveApcosBtn;
+
+    @FindBy(xpath = "//a[normalize-space()='Update Activities']")
+    private WebElement updateActivitiesBtn;
+
+    @FindBy(xpath = "//input[@id='visitChecksVOData0.checkBoxValue1']")
+    private WebElement secondVisitchk1;
+
+    @FindBy(xpath = "//input[@id='visitChecksVOData1.checkBoxValue1']")
+    private WebElement secondVisitchk2;
+
+    @FindBy(xpath = "//input[@id='visitChecksVOData2.checkBoxValue1']")
+    private WebElement secondVisitchk3;
+
+    @FindBy(xpath = "//input[@id='visitChecksVOData3.checkBoxValue1']")
+    private WebElement secondVisitchk4;
+
+    @FindBy(xpath = "//input[@id='animalPhotoLeft']")
+    private WebElement animalPhotoLeft;
+
+    @FindBy(xpath = "//input[@id='animalPhotoFront']")
+    private WebElement animalPhotoFront;
+
+    @FindBy(xpath = "//input[@id='animalPhotoRight']")
+    private WebElement animalPhotoRight;
+
+    @FindBy(xpath = "//button[normalize-space()='Submit']")
+    private WebElement submit2ndVisitBtn;
+
+    @FindBy(xpath = "//div[contains(@class,'alert alert-danger')]")
+    private WebElement updateActivityErrorMessage;
+
+
     private String registeredMobileNumber;
 
     public AHELP_LoginPage(WebDriver driver) throws IOException {
@@ -244,7 +317,7 @@ public class AHELP_LoginPage extends BasePage {
 
     private void loadExcelData() throws IOException {
         String filePath = "src/test/resources/testdata/test-data.xlsx";
-        System.out.println("Loading Excel from: " + filePath);
+
 
         Object[][] farmerData = ExcelUtils.getTestData(filePath, "FarmerData");
         if (farmerData.length > 0) {
@@ -296,6 +369,14 @@ public class AHELP_LoginPage extends BasePage {
         click(loginSubmitButton);
     }
 
+    public void showLogin(String username, String password) throws InterruptedException {
+
+        selectAHELPRole();
+        enterUsername(username);
+        enterPassword(password);
+        submitLogin();
+        waitForPageLoad();
+    }
     public void loginAsAHELP(String username, String password) throws InterruptedException {
         clickMainLoginButton();
         selectAHELPRole();
@@ -353,6 +434,144 @@ public class AHELP_LoginPage extends BasePage {
         click(submitRegistrationButton);
         Thread.sleep(3000);
     }
+    private WebDriverWait wait;
+
+    public void addBankDetails() {
+        click(addBank);
+
+        sendKeys(bankNameField, "State Bank of India");
+        sendKeys(accountNumberField, RandomStringUtils.randomNumeric(16));
+        sendKeys(ifscCodeField, "SBIN0001234");
+        sendKeys(passbookUploadField, FileConstants.MAXRES_PDF);
+
+        click(submitBankDetailsButton);
+        acceptAlert();
+    }
+
+
+
+
+
+
+
+
+    public void SecondVisitUpdate() throws InterruptedException {
+        loginAndOpensecond();
+        addBankDetails();
+        uploadAgreement();
+        updateApcos();
+        Thread.sleep(2000);
+        updateActivities("65", "85");
+    }
+
+    public void thirdVisitUpdate() throws InterruptedException {
+        loginAndOpenProfile();
+        click(viewNewBtn);
+        updateActivities("90", "110");
+    }
+    private void updateFourthvisit(String girth, String length)
+            throws InterruptedException {
+        click(secondVisitchk1);
+        click(secondVisitchk2);
+        click(secondVisitchk3);
+        sendKeys(girthField, girth);
+        sendKeys(lengthField, length);
+        waitForMilliseconds(2000);
+        sendKeys(animalPhotoLeft, FileConstants.cowLeftpng);
+        sendKeys(animalPhotoFront, FileConstants.cowFrontpng);
+        sendKeys(animalPhotoRight, FileConstants.cowRightpng);
+        click(submit2ndVisitBtn);
+    }
+
+    public void FourthVisitUpdate() throws InterruptedException {
+
+        updateFourthvisit("95", "120");
+    }
+    public void verifyUpdateActivity() throws InterruptedException {
+        if(updateActivityErrorMessage.isDisplayed()) {
+            System.out.println("Error message displayed as expected: " + updateActivityErrorMessage.getText());
+        } else {
+            System.out.println("Error message not displayed when it should be.");
+        }
+    }
+
+    private void updateActivities(String girth, String length)
+            throws InterruptedException {
+        click(updateActivitiesBtn);
+        click(secondVisitchk1);
+        click(secondVisitchk2);
+        click(secondVisitchk3);
+        click(secondVisitchk4);
+        sendKeys(girthField, girth);
+        sendKeys(lengthField, length);
+        waitForMilliseconds(2000);
+        sendKeys(animalPhotoLeft, FileConstants.cowLeftpng);
+        sendKeys(animalPhotoFront, FileConstants.cowFrontpng);
+        sendKeys(animalPhotoRight, FileConstants.cowRightpng);
+        Thread.sleep(2000);
+        clickWithJS(submit2ndVisitBtn);
+        verifyUpdateActivity();
+    }
+    private void loginAndOpensecond() throws InterruptedException {
+        loginAsAHELP(
+                ConfigReader.getUsername("ahelp"),
+                ConfigReader.getPassword("ahelp")
+        );
+        newSlbpProfile();
+        click(searchOwner);
+        registeredMobileNumber = getTestFarmerMobile();
+        searchOwnerByMobile();
+        click(viewProfileBtn);
+    }
+
+    private void loginAndOpenProfile() throws InterruptedException {
+        showLogin(
+                ConfigReader.getUsername("ahelp"),
+                ConfigReader.getPassword("ahelp")
+        );
+        newSlbpProfile();
+        click(searchOwner);
+        registeredMobileNumber = getTestFarmerMobile();
+        searchOwnerByMobile();
+        click(viewProfileBtn);
+    }
+
+
+    private void uploadAgreement() throws InterruptedException {
+        click(viewNewBtn);
+        Thread.sleep(2000);
+        click(uploadSlbpbtn);
+        sendKeys(agreementUploadField, FileConstants.sampleSLBPDF);
+        click(uploadAgreementButton);
+        acceptAlert();
+    }
+
+    private void updateApcos() {
+        click(updateApcosBtn);
+        Select select = new Select(apcosDropdown);
+        select.selectByIndex(1);
+
+        click(saveApcosBtn);
+        acceptAlert();
+    }
+
+
+
+    protected void acceptAlert() {
+
+        if (wait == null) {
+            wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        }
+
+        wait.until(ExpectedConditions.alertIsPresent());
+
+        Alert alert = driver.switchTo().alert();
+        alert.accept();
+    }
+
+
+
+
 
     public void searchOwnerByMobile() throws InterruptedException {
         if (registeredMobileNumber != null) {
