@@ -316,38 +316,63 @@ public class AHELP_LoginPage extends BasePage {
     }
 
     private void loadExcelData() throws IOException {
-        String filePath = "src/test/resources/testdata/test-data.xlsx";
 
+    String filePath = "src/test/resources/testdata/test-data.xlsx";
 
-        Object[][] farmerData = ExcelUtils.getTestData(filePath, "FarmerData");
-        if (farmerData.length > 0) {
-            farmerFirstName = (String) farmerData[0][0];
-            farmerLastName = (String) farmerData[0][1];
-            farmerAddress = (String) farmerData[0][2];
-            farmerRationCardNumber = (String) farmerData[0][3];
-            farmerPincode = (String) farmerData[0][4];
-            farmerDateOfBirth = (String) farmerData[0][5];
+    // ================= FARMER DATA =================
+
+    Object[][] farmerData = ExcelUtils.getTestData(filePath, "FarmerData");
+    if (farmerData.length > 0) {
+        farmerFirstName = String.valueOf(farmerData[0][0]);
+        farmerLastName = String.valueOf(farmerData[0][1]);
+        farmerAddress = String.valueOf(farmerData[0][2]);
+        farmerRationCardNumber = String.valueOf(farmerData[0][3]);
+        farmerPincode = String.valueOf(farmerData[0][4]);
+
+        // DATE FORMAT FIX
+        Object dobObj = farmerData[0][5];
+        if (dobObj instanceof java.util.Date) {
+            java.text.SimpleDateFormat sdf =
+                    new java.text.SimpleDateFormat("dd-MM-yyyy");
+            farmerDateOfBirth = sdf.format((java.util.Date) dobObj);
+        } else {
+
+            farmerDateOfBirth = dobObj.toString();
         }
-
-
-        Object[][] calfData = ExcelUtils.getTestData(filePath, "CalfData");
-        if (calfData.length > 0) {
-            calfPetName = (String) calfData[0][0];
-            calfDateOfBirth = (String) calfData[0][1];
-            calfIdentificationMark = (String) calfData[0][2];
-        }
-
-
-        Object[][] enrollmentData = ExcelUtils.getTestData(filePath, "EnrollmentData");
-        if (enrollmentData.length > 0) {
-            calfLength = (String) enrollmentData[0][0];
-            calfGirth = (String) enrollmentData[0][1];
-            enrollmentGirth = (String) enrollmentData[0][2];
-            enrollmentLength = (String) enrollmentData[0][3];
-            enrollmentRemarks = (String) enrollmentData[0][4];
-        }
-
     }
+
+    // ================= CALF DATA =================
+
+    Object[][] calfData = ExcelUtils.getTestData(filePath, "CalfData");
+    if (calfData.length > 0) {
+        calfPetName = String.valueOf(calfData[0][0]);
+
+        // DATE FORMAT FIX
+        Object calfDobObj = calfData[0][1];
+        if (calfDobObj instanceof java.util.Date) {
+            java.text.SimpleDateFormat sdf =
+                    new java.text.SimpleDateFormat("dd-MM-yyyy");
+            calfDateOfBirth = sdf.format((java.util.Date) calfDobObj);
+
+        } else {
+            calfDateOfBirth = calfDobObj.toString();
+
+        }
+        calfIdentificationMark = String.valueOf(calfData[0][2]);
+    }
+
+
+    Object[][] enrollmentData =
+            ExcelUtils.getTestData(filePath, "EnrollmentData");
+
+    if (enrollmentData.length > 0) {
+        calfLength = String.valueOf(enrollmentData[0][0]);
+        calfGirth = String.valueOf(enrollmentData[0][1]);
+        enrollmentGirth = String.valueOf(enrollmentData[0][2]);
+        enrollmentLength = String.valueOf(enrollmentData[0][3]);
+        enrollmentRemarks = String.valueOf(enrollmentData[0][4]);
+    }
+}
 
     public void clickMainLoginButton() {
         click(loginMainButton);
@@ -377,6 +402,7 @@ public class AHELP_LoginPage extends BasePage {
         submitLogin();
         waitForPageLoad();
     }
+
     public void loginAsAHELP(String username, String password) throws InterruptedException {
         clickMainLoginButton();
         selectAHELPRole();
@@ -405,35 +431,61 @@ public class AHELP_LoginPage extends BasePage {
     }
 
     public void addFarmer() throws InterruptedException {
-        registeredMobileNumber = getTestFarmerMobile(); // Mobile from config.properties
+
+        registeredMobileNumber = getTestFarmerMobile();
 
         click(clickHereLink);
-        sendKeys(mobileNumberField, registeredMobileNumber);
-        sendKeys(firstNameField, farmerFirstName);           // From Excel
-        sendKeys(lastNameField, farmerLastName);             // From Excel
-        sendKeys(addressField, farmerAddress);               // From Excel
-        sendKeys(rationCardNumberField, farmerRationCardNumber); // From Excel
-        sendKeys(pincodeField, farmerPincode);               // From Excel
 
-        // These remain as direct interactions (not from Excel)
+        // Farmer Details
+        sendKeys(mobileNumberField, registeredMobileNumber);
+        sendKeys(firstNameField, farmerFirstName);
+        sendKeys(lastNameField, farmerLastName);
+        sendKeys(addressField, farmerAddress);
+        sendKeys(rationCardNumberField, farmerRationCardNumber);
+        sendKeys(pincodeField, farmerPincode);
+
+        // Reservation Category
         click(reservationCategoryDropdown);
         click(reservationCategoryGeneralOption);
+
+        // District
         click(districtDropdown);
         click(districtPathanamthittaOption);
+
+        // Local Body Type
         click(localBodyTypeDropdown);
         click(localBodyTypePanchayatOption);
+
+        // Local Body
         click(localBodyDropdown);
         click(localBodyEnadimangalamOption);
+
+        // Ward
         click(wardDropdown);
         click(wardMangaduVadakOption);
 
-        sendKeys(dateOfBirthField, farmerDateOfBirth);       // From Excel
-        click(dateOfBirthMay1Option);
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        String formattedDOB = farmerDateOfBirth.trim();
+
+        click(dateOfBirthField);
+
+        Thread.sleep(1000);
+
+        // Set Flatpickr date properly
+        js.executeScript(
+                "arguments[0]._flatpickr.setDate(arguments[1], true, 'd-m-Y')",
+                dateOfBirthField,
+                formattedDOB
+        );
+
+        Thread.sleep(1000);
         click(genderMaleRadioButton);
         click(dataConsentCheckbox);
         click(submitRegistrationButton);
         Thread.sleep(3000);
     }
+
     private WebDriverWait wait;
 
     public void addBankDetails() {
@@ -447,13 +499,6 @@ public class AHELP_LoginPage extends BasePage {
         click(submitBankDetailsButton);
         acceptAlert();
     }
-
-
-
-
-
-
-
 
     public void SecondVisitUpdate() throws InterruptedException {
         loginAndOpensecond();
@@ -469,6 +514,7 @@ public class AHELP_LoginPage extends BasePage {
         click(viewNewBtn);
         updateActivities("90", "110");
     }
+
     private void updateFourthvisit(String girth, String length)
             throws InterruptedException {
         click(secondVisitchk1);
@@ -487,6 +533,7 @@ public class AHELP_LoginPage extends BasePage {
 
         updateFourthvisit("95", "120");
     }
+
     public void verifyUpdateActivity() throws InterruptedException {
         if(updateActivityErrorMessage.isDisplayed()) {
             System.out.println("Error message displayed as expected: " + updateActivityErrorMessage.getText());
@@ -536,7 +583,6 @@ public class AHELP_LoginPage extends BasePage {
         click(viewProfileBtn);
     }
 
-
     private void uploadAgreement() throws InterruptedException {
         click(viewNewBtn);
         Thread.sleep(2000);
@@ -555,8 +601,6 @@ public class AHELP_LoginPage extends BasePage {
         acceptAlert();
     }
 
-
-
     protected void acceptAlert() {
 
         if (wait == null) {
@@ -568,10 +612,6 @@ public class AHELP_LoginPage extends BasePage {
         Alert alert = driver.switchTo().alert();
         alert.accept();
     }
-
-
-
-
 
     public void searchOwnerByMobile() throws InterruptedException {
         if (registeredMobileNumber != null) {
@@ -591,32 +631,66 @@ public class AHELP_LoginPage extends BasePage {
         this.registeredMobileNumber = mobile;
     }
 
-    public void newCalfReg() {
+    public void newCalfReg() throws InterruptedException {
+
         click(viewProfileBtn);
+
         click(registerNewCalfBtn);
+
         click(damNotAvailableCheckbox);
+
         waitForPageLoad();
 
         String uniqueTag = RandomStringUtils.randomNumeric(12);
+
         sendKeys(earTagNumberField, uniqueTag);
 
         waitForElementToBeClickable(breedTypeCrossbredRadioButton);
+
         scrollToElement(breedTypeCrossbredRadioButton);
+
         clickWithJS(breedTypeCrossbredRadioButton);
 
-        sendKeys(petNameField, calfPetName);                 // From Excel
+        sendKeys(petNameField, calfPetName);
+
         click(breedDropdown);
+
         click(holsteinFresianDropdown);
-        sendKeys(calfDateOfBirthField, calfDateOfBirth);     // From Excel
-        click(calfDateOfBirthMay7Option);
+
+        // ================= CALF DATE OF BIRTH =================
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        String formattedCalfDOB = calfDateOfBirth.trim();
+
+        click(calfDateOfBirthField);
+
+        Thread.sleep(1000);
+
+        // Set Flatpickr date properly
+        js.executeScript(
+                "arguments[0]._flatpickr.setDate(arguments[1], true, 'd-m-Y')",
+                calfDateOfBirthField,
+                formattedCalfDOB
+        );
+        js.executeScript(
+                "arguments[0]._flatpickr.close()",
+                calfDateOfBirthField
+        );
+        Thread.sleep(1000);
+
         click(colorDropdown);
+
         click(amberChampagneColorOption);
-        sendKeys(identificationMarkField, calfIdentificationMark); // From Excel
+
+        sendKeys(identificationMarkField, calfIdentificationMark);
+
         click(calfDataConsentCheckbox);
+
         click(submitCalfRegistrationButton);
     }
 
-    public String newCalfRegAndGetAlert() {
+    public String newCalfRegAndGetAlert() throws InterruptedException {
         newCalfReg();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.alertIsPresent());
@@ -663,7 +737,7 @@ public class AHELP_LoginPage extends BasePage {
         return enrollmentSuccessMessage.getText();
     }
 
-        public void loginWithConfigCredentials() throws InterruptedException {
+    public void loginWithConfigCredentials() throws InterruptedException {
             String username = ConfigReader.getUsername("ahelp");
             String password = ConfigReader.getPassword("ahelp");
             loginAsAHELP(username, password);
