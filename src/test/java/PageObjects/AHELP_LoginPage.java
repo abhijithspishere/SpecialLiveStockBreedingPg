@@ -12,6 +12,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 public class AHELP_LoginPage extends BasePage {
 
@@ -307,6 +309,15 @@ public class AHELP_LoginPage extends BasePage {
     @FindBy(xpath = "//div[contains(@class,'alert alert-danger')]")
     private WebElement updateActivityErrorMessage;
 
+    @FindBy(xpath = "//input[@id='pubYes22']")
+    private WebElement pubertyYesBtn;
+
+    @FindBy(xpath = "//span[contains(@class,'flatpickr-day today')]")
+    private WebElement todayDate;
+
+    @FindBy(xpath = "//input[@id='pubertyDate']")
+    private WebElement pubertyDateField;
+
 
     private String registeredMobileNumber;
 
@@ -514,6 +525,49 @@ public class AHELP_LoginPage extends BasePage {
         click(viewNewBtn);
         updateActivities("90", "110");
     }
+    public void fifthVisitUpdate() throws InterruptedException {
+        loginAndOpenProfile();
+        click(viewNewBtn);
+        List<WebElement> fifthVisitCheckboxes = Arrays.asList(
+                secondVisitchk1,
+                secondVisitchk2
+        );
+        updateActivitiesNew("120", "140", fifthVisitCheckboxes);
+    }
+
+    public void sixthVisitUpdate() throws InterruptedException {
+        loginAndOpenProfile();
+        click(viewNewBtn);
+        List<WebElement> sixthVisitCheckboxes = Arrays.asList(
+                secondVisitchk1
+        );
+        updateActivitiesNew("140", "160", sixthVisitCheckboxes);
+    }
+
+    public void eighthVisitUpdate() throws InterruptedException {
+        loginAndOpenProfile();
+        click(viewNewBtn);
+        List<WebElement> sixthVisitCheckboxes = Arrays.asList(
+                secondVisitchk1
+        );
+        updateActivitiesPuberty("190", "200", sixthVisitCheckboxes);
+    }
+
+    public boolean fourthVisitRestrict() throws InterruptedException {
+
+        loginAndOpensecond();
+
+
+        scrollToElement(viewNewBtn);
+        clickWithJS(viewNewBtn);
+        if(updateActivityErrorMessage.isDisplayed()) {
+            System.out.println("Ahelp user is restricted from updating 4th visit activities as expected: " + updateActivityErrorMessage.getText());
+            return true;
+        } else {
+            System.out.println("Error message not displayed when it should be.");
+            return false;
+        }
+    }
 
     private void updateFourthvisit(String girth, String length)
             throws InterruptedException {
@@ -559,6 +613,70 @@ public class AHELP_LoginPage extends BasePage {
         clickWithJS(submit2ndVisitBtn);
         verifyUpdateActivity();
     }
+
+
+    private void updateActivitiesPuberty(String girth,
+                                     String length,
+                                     List<WebElement> checkboxes)
+            throws InterruptedException {
+
+        click(updateActivitiesBtn);
+
+        for (WebElement checkbox : checkboxes) {
+            click(checkbox);
+        }
+
+        sendKeys(girthField, girth);
+        sendKeys(lengthField, length);
+
+        waitForMilliseconds(2000);
+
+        sendKeys(animalPhotoLeft, FileConstants.cowLeftpng);
+        sendKeys(animalPhotoFront, FileConstants.cowFrontpng);
+        sendKeys(animalPhotoRight, FileConstants.cowRightpng);
+
+        Thread.sleep(2000);
+        click(pubertyYesBtn);
+        click(pubertyDateField);
+        click(todayDate);
+        clickWithJS(submit2ndVisitBtn);
+        verifyUpdateActivity();
+
+    }
+
+
+    private void updateActivitiesNew(String girth,
+                                     String length,
+                                     List<WebElement> checkboxes)
+            throws InterruptedException {
+
+        click(updateActivitiesBtn);
+
+        for (WebElement checkbox : checkboxes) {
+            click(checkbox);
+        }
+
+        sendKeys(girthField, girth);
+        sendKeys(lengthField, length);
+
+        waitForMilliseconds(2000);
+
+        sendKeys(animalPhotoLeft, FileConstants.cowLeftpng);
+        sendKeys(animalPhotoFront, FileConstants.cowFrontpng);
+        sendKeys(animalPhotoRight, FileConstants.cowRightpng);
+
+        Thread.sleep(2000);
+
+        clickWithJS(submit2ndVisitBtn);
+
+        verifyUpdateActivity();
+    }
+
+
+
+
+
+
     private void loginAndOpensecond() throws InterruptedException {
         loginAsAHELP(
                 ConfigReader.getUsername("ahelp"),
@@ -688,6 +806,11 @@ public class AHELP_LoginPage extends BasePage {
         click(calfDataConsentCheckbox);
 
         click(submitCalfRegistrationButton);
+    }
+
+    // Add this method to your AHELP_LoginPage class
+    public String getCalfDateOfBirth() {
+        return calfDateOfBirth;  // This is already loaded from Excel
     }
 
     public String newCalfRegAndGetAlert() throws InterruptedException {

@@ -53,7 +53,6 @@ public class FLIO_Login extends BasePage {
     @FindBy(xpath = "//button[contains(.,'Verified')]")
     private WebElement verifyVisit2Button;
 
-
     public FLIO_Login(WebDriver driver) throws IOException {
         super(driver);
     }
@@ -76,6 +75,7 @@ public class FLIO_Login extends BasePage {
         sendKeys(ahdPasswordField,password);
         click(ahdLoginSubmitButton);
     }
+
     public void navigationLink() throws InterruptedException {
         click(navigationLink);
     }
@@ -87,6 +87,7 @@ public class FLIO_Login extends BasePage {
         clickWithJS(taskScheduleLink);
         click(viewTasksLink);
     }
+
     public void updateFourthvisit() throws InterruptedException {
         String mobileNumber = ConfigReader.getProperty("test.farmer.mobile");
         String xpath =
@@ -118,7 +119,6 @@ public class FLIO_Login extends BasePage {
         flioApproval();
         clickVerifyVisitForConfiguredMobile();
     }
-
 
     public void clickApproveEnrollmentForConfiguredMobile() throws InterruptedException {
         String mobileNumber = ConfigReader.getProperty("test.farmer.mobile");

@@ -66,7 +66,8 @@ public class Doctor_Login extends FLIO_Login {
         click(ahdLoginSubmitButton);
     }
 
-    public void editAge() throws InterruptedException {
+    public void editAge(String expectedDate) throws InterruptedException {
+
         click(selectVeterinary);
         click(ownerAnimalMgmtLink);
         ahelpLoginPage.setRegisteredMobileNumber(
@@ -79,7 +80,7 @@ public class Doctor_Login extends FLIO_Login {
         click(selfOwnedOption);
         click(simpleParityOption);
         click(parityOption);
-        sendKeys(dateOfBirthField, "09/04/2026");
+        sendKeys(dateOfBirthField, expectedDate);
         click(saveBtn);
         Thread.sleep(3000);
     }
@@ -107,6 +108,8 @@ public class Doctor_Login extends FLIO_Login {
     public String getUpdatedDateAfterEdit() throws InterruptedException {
         click(editProfileButton);
         click(confirmEditButton);
-        return dateOfBirthField.getAttribute("value");
+        String dateValue = dateOfBirthField.getAttribute("value");  // Get the value
+        System.out.println("Retrieved date from field: " + dateValue);  // Debug
+        return dateValue;
     }
 }

@@ -13,11 +13,10 @@
           <!--  <class name="Tests.TC_002_DuplicateMobileNumberError"/>-->
         </classes>
     </test>
-<!--
 
     <test name="FLIO Tests">
         <classes>
-            &lt;!&ndash;<class name="Tests.TC_005_FLIO_Login"/>&ndash;&gt;
+            <!--<class name="Tests.TC_005_FLIO_Login"/>-->
             <class name="Tests.TC_006_FlioApproval"/>
         </classes>
     </test>
@@ -31,11 +30,10 @@
             <class name="Tests.TC_008_AhelpSecVisit"/>
             <class name="Tests.TC_009_FlioVerifySecVisit"/>
             <class name="Tests.TC_010_AhelpThirdVisit"/>
-            <class name="Tests.TC_011_FlioThirdApproval"/>&lt;!&ndash;
-            <class name="Tests.TC_012_FourthVisit"/>&ndash;&gt;
+            <class name="Tests.TC_011_FlioThirdApproval"/><!--
+            <class name="Tests.TC_012_FourthVisit"/>-->
 
         </classes>
     </test>
--->
 
 </suite>
