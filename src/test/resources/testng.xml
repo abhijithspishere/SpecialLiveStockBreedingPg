@@ -10,28 +10,42 @@
             <class name="Tests.TC_001_AHELP_LoginTest"/>
             <class name="Tests.TC_003_NewCalfRegistration"/>
             <class name="Tests.TC_004_CalfEnrollmentTest"/>
-          <!--  <class name="Tests.TC_002_DuplicateMobileNumberError"/>-->
+             <class name="Tests.TC_002_DuplicateMobileNumberError"/>
         </classes>
     </test>
 
     <test name="FLIO Tests">
         <classes>
-            <!--<class name="Tests.TC_005_FLIO_Login"/>-->
+             <class name="Tests.TC_005_FLIO_Login"/>
             <class name="Tests.TC_006_FlioApproval"/>
         </classes>
     </test>
+
     <test name="Doctor Tests">
         <classes>
             <class name="Tests.TC_007_Doctor_Login"/>
         </classes>
     </test>
+
     <test name="AHELP 2ndVisit Tests">
         <classes>
             <class name="Tests.TC_008_AhelpSecVisit"/>
             <class name="Tests.TC_009_FlioVerifySecVisit"/>
             <class name="Tests.TC_010_AhelpThirdVisit"/>
-            <class name="Tests.TC_011_FlioThirdApproval"/><!--
-            <class name="Tests.TC_012_FourthVisit"/>-->
+            <class name="Tests.TC_011_FlioThirdApproval"/>
+             <class name="Tests.TC_012_FourthVisit"/>
+
+            <class name="Tests.TC_013_AhelpFourthRestrict"/>
+            <class name="Tests.TC_014_AhelpFifthVisit"/>
+            <class name="Tests.TC_015_FlioVerifyFifthVisit"/>
+            <class name="Tests.TC_016_AhelpSixthVisit"/>
+            <class name="Tests.TC_017_FlioVerifySixthVisit"/>
+            <class name="Tests.TC_018_AhelpSeventhVisit"/>
+            <class name="Tests.TC_019_FlioVerifySeventhVisit"/>
+            <class name="Tests.TC_020_AhelpEighthVisit"/>
+            <class name="Tests.TC_021_FlioVerifyEighthVisit"/>
+            <class name="Tests.TC_022_AhelpNinthVisit"/>
+            <class name="Tests.TC_023_FlioVerifyNinthVisit"/>
 
         </classes>
     </test>

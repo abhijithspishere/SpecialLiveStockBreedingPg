@@ -550,7 +550,7 @@ public class AHELP_LoginPage extends BasePage {
         List<WebElement> sixthVisitCheckboxes = Arrays.asList(
                 secondVisitchk1
         );
-        updateActivitiesPuberty("190", "200", sixthVisitCheckboxes);
+        updateActivitiesPuberty("200", "250", sixthVisitCheckboxes);
     }
 
     public boolean fourthVisitRestrict() throws InterruptedException {
@@ -615,7 +615,7 @@ public class AHELP_LoginPage extends BasePage {
     }
 
 
-    private void updateActivitiesPuberty(String girth,
+   /* private void updateActivitiesPuberty(String girth,
                                      String length,
                                      List<WebElement> checkboxes)
             throws InterruptedException {
@@ -642,6 +642,47 @@ public class AHELP_LoginPage extends BasePage {
         clickWithJS(submit2ndVisitBtn);
         verifyUpdateActivity();
 
+    }*/
+
+    private void updateActivitiesPuberty(String girth,
+                                         String length,
+                                         List<WebElement> checkboxes)
+            throws InterruptedException {
+
+        click(updateActivitiesBtn);
+
+        for (WebElement checkbox : checkboxes) {
+            click(checkbox);
+        }
+
+        sendKeys(girthField, girth);
+        sendKeys(lengthField, length);
+
+        waitForMilliseconds(2000);
+
+        sendKeys(animalPhotoLeft, FileConstants.cowLeftpng);
+        sendKeys(animalPhotoFront, FileConstants.cowFrontpng);
+        sendKeys(animalPhotoRight, FileConstants.cowRightpng);
+
+        Thread.sleep(2000);
+
+        click(pubertyYesBtn);
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        String pubertyDate = "10-02-2026";
+
+        click(pubertyDateField);
+
+        js.executeScript(
+                "arguments[0]._flatpickr.setDate(arguments[1], true, 'd-m-Y')",
+                pubertyDateField,
+                pubertyDate
+        );
+
+        clickWithJS(submit2ndVisitBtn);
+
+        verifyUpdateActivity();
     }
 
 
